@@ -1,2 +1,6 @@
 # 2.3-Base
-solution for 2.3 exercise
+solution for 2.3 exercise  
+Текст запросов согласно задания - в папке Решение_база  
+Запросы написаны и проверялись через DBeaver
+Контейнер в папке compose  
+Схема данных в папке documentation
