@@ -1,0 +1,64 @@
+1.
+select clients.ID, clients.Билет, clients.ФИО, sub.Книг_прочитано from clients
+inner join (select rent.client_id,count(*) as Книг_прочитано 
+from rent
+inner join return on rent.id = return.rent_id
+group by rent.client_id) as sub on sub.client_id = clients.id
+order by sub.Книг_прочитано DESC
+
+2.
+select count(*) as Книг_На_руках from (select rent.id from rent except select rent_id from return) as sub
+
+3.
+-- ниже по тексту строка с соответствующим комментом в которой надо указать название искомой книги
+
+select clients.ФИО from clients
+inner join (
+	select rent.client_id from rent
+	inner join (
+		select rent.id from rent 
+		    where rent.book_id = (select id from bookserie where Название like '%мир%') --укажите в этой строке внутри знаков %% часть названия книги
+		except 
+		select rent_id from return) as renter 
+		on renter.id = rent.id
+	) as clienter
+	on clienter.client_id = clients.id
+
+4.
+	select on_rent.book_id,b_namer."Название" from rent as on_rent
+	inner join (
+		select rent.id from rent 
+		except select rent_id from return) as non_return
+		on on_rent.id = non_return.id
+	left join bookserie as b_namer on on_rent.book_id = b_namer.id
+5.
+--применил distinct так как у читателя может быть несколько просроченных книг, а в задании указано посчитать в людях
+
+	select count(distinct(on_rent.client_id)) from rent as on_rent
+	inner join (
+		select rent.id from rent 
+		except select rent_id from return) as non_return
+		on on_rent.id = non_return.id
+	where on_rent."Выдана" < current_date
+
+6.
+	select printer.title, count(on_rent.book_id) as rent_qty from rent as on_rent
+	left join printcompany as printer on on_rent.book_id = printer.book_id
+	group by printer.title order by rent_qty desc
+7.
+	select bookserie."Автор", count(*) over (partition by bookserie."Автор") as Количество_книг from bookserie
+	order by Количество_книг desc limit 1
+8.
+	WITH counted_pages AS(
+	SELECT 	on_rent.client_id, 
+			SUM(books_table."Объем") AS pages, 
+			SUM((on_return."Возврат" - on_rent."Выдана")) AS read_longitude 
+			FROM rent AS on_rent
+	INNER JOIN return AS on_return ON on_return.rent_id = on_rent.id
+	LEFT JOIN bookserie AS books_table ON books_table.id = on_rent.book_id
+	GROUP BY client_id)
+	SELECT 	clients."ФИО", 
+			clients."Билет", 
+			(counted_pages.pages/counted_pages.read_longitude) AS Среднее_количество_страниц_в_день 
+			FROM counted_pages
+		LEFT join clients on clients.id = counted_pages.client_id

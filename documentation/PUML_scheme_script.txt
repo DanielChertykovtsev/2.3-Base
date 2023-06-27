@@ -1,0 +1,44 @@
+@startuml
+digraph g {
+graph [
+rankdir = "LR"
+];
+node [
+fontsize = "16"
+shape = "record"
+];
+edge [
+];
+"node0" [
+label = "<f0> BookSerie| <f1> ID (primary key) : serial	| Шифр : varchar	| Название : varchar	| Автор	: varchar | Год : int | Объем : int | Цена : decimal | Кол-во : int"
+shape = "record"
+];
+"node1" [
+label = "<f0> Clients| <f1> ID (primary key) : serial | Билет : VARCHAR | ФИО : VARCHAR	| Адрес : VARCHAR	| Телефон : VARCHAR | Дата_записи :	date "
+shape = "record"
+];
+"node2" [
+label = "<f0> Rent| <f1> ID (primary key) : serial |
+<f2>Client (foreign key) : integer |
+<f3>Book (foreign key) : integer	| Выдана : date	"
+shape = "record"
+];
+"node3" [
+label = "<f0> PrintCompany| <f1> ID (primary key) : serial | <f2> Book_id (foreign key) : integer | Title : varchar	| City: varchar"
+];
+"node4" [
+label = "Return|ID (primary key):serial|<f0> Rent_ID : integer|Возврат : date"
+];
+"node2":f2 -> "node0":f1 [
+id = 0
+];
+"node2":f3 -> "node1":f1 [
+id = 1
+];
+"node4":f0 -> "node2":f1  [id = 2
+];
+"node3":f2 ->"node0":f1 [
+id=3
+];
+}
+@enduml
